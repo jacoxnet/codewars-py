@@ -1,18 +1,18 @@
 from enum import Enum
 from math import sqrt
-from copy import copy, deepcopy
+import time
  
 # puzzle for testing
 
-puzzle =     [[1,0,0,6,0,0,0,9,0],
-              [0,0,0,0,0,1,0,8,0],
-              [4,0,3,2,0,7,6,1,5],
-              [0,7,0,0,0,8,1,0,3],
-              [3,0,0,7,0,2,0,0,6],
-              [6,0,1,9,0,0,0,7,0],
-              [8,6,5,3,0,9,4,0,1],
-              [0,1,0,8,0,0,0,0,0],
-              [0,3,0,0,0,4,0,0,9]]
+# puzzle =     [[1,0,0,6,0,0,0,9,0],
+#               [0,0,0,0,0,1,0,8,0],
+#               [4,0,3,2,0,7,6,1,5],
+#               [0,7,0,0,0,8,1,0,3],
+#               [3,0,0,7,0,2,0,0,6],
+#               [6,0,1,9,0,0,0,7,0],
+#               [8,6,5,3,0,9,4,0,1],
+#               [0,1,0,8,0,0,0,0,0],
+#               [0,3,0,0,0,4,0,0,9]]
 
 
 # puzzle = [[5,3,0,0,7,0,0,0,0],
@@ -35,6 +35,15 @@ puzzle =     [[1,0,0,6,0,0,0,9,0],
 #           [2,4,8,9,5,7,1,3,6],
 #           [7,6,3,4,1,8,2,5,9]]
 
+puzzle = [[0,6,2,0,0,0,0,5,7],
+          [0,0,0,0,0,0,0,0,4],
+          [3,0,0,6,0,2,8,0,0],
+          [0,0,0,0,6,4,0,0,0],
+          [0,5,0,9,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0],
+          [0,0,0,3,0,0,0,0,0],
+          [8,1,0,0,0,0,0,0,6],
+          [0,4,9,7,5,0,0,0,0]]
 
 # contains representation of Sudoku puzzle
 # 
@@ -102,14 +111,11 @@ class Puzzleboard:
         return self.allnums - (self.getbox((loc[0], loc[1])) | self.getrow(loc[0]) | self.getcol(loc[1]))
 
     def findzero1(self):
-        # print("set:   ", len(self.zeros))
         if len(self.zeros) > 0:
-            zitem = self.zeros.pop()
-            # don't remove from zero list until later
-            self.zeros.add(zitem)
+            zitem = min(self.zeros)
             return zitem
         else:
-            return (-1, -1)
+            return (self.size, self.size)
             
     
     def solve(self):
@@ -117,7 +123,7 @@ class Puzzleboard:
         #print("entering solve, testloc: ", testloc)
         #print("zerolist: ", self.zeros)
         # if no more zeros we're done
-        if testloc[0] == -1:
+        if testloc[0] == self.size:
             return True
         # try each testnum in possibles
         list_of_possibles = self.get_possibles(testloc)
@@ -147,4 +153,7 @@ def sudoku(puzzle):
     return P.makelist()
 
 if __name__ == '__main__':
+    start = time.time()
     sudoku(puzzle)
+    end = time.time()
+    print("Time: ", end-start)
