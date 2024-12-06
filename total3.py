@@ -19,32 +19,30 @@ def calc_area(rect):
     return (x2 - x1) * (y2 - y1)
 
 # check two rects whether rectangle A contains all or part of rect B
-# and if so return list of non-overlapping rectangle portion of B
-# return [] if none
+# and if so return non-overlapping rectangle portion of B
+# return  if none
 #   recta (abotleft, atopright)
 #   rectb (bbotleft, btopright)
 def rect_overlaps(recta, rectb):
     ax1, ay1, ax2, ay2 = recta
     bx1, by1, bx2, by2 = rectb
     x1, x2 = line_overlaps((ax1, ax2), (bx1, bx2)); y1, y2 = line_overlaps((ay1, ay2), (by1, by2))
-    return calc_area((x1, y1, x2, y2)), (x1, y1, x2, y2)
+    return (x1, y1, x2, y2)
 
     
-# process overlaps from a dict with cardinality keys and rects (prior overlaps)
-# returns new cardinality rects and area
-def process_overlaps(cardinality, crects):
-    
+# process overlaps in combinations based on count input
+# returns overlap area
+def process_overlaps(count, rectangles):
+    # produce tuples with proper number of combinations for analysis
     area = 0
-    return_crects = {}
-    for (carda, recta), (cardb, rectb) in combinations(crects.items(), 2):
-        newkey = carda.union(cardb)
-        if len(newkey) != cardinality:
-            continue
-        if newkey not in return_crects.keys():
-            oarea, overlaps = rect_overlaps(recta, rectb)
-            return_crects[newkey] = overlaps
-            area += oarea
-    return area, return_crects
+    for rect_tuple in combinations(rectangles, count):
+        # within these tuples, calculate overlapping of all rectangles
+        # first rect is first overlap
+        overlap = rect_tuple[0]
+        for next_tuple_index in range(1, len(rect_tuple)):
+            overlap = rect_overlaps(overlap, rect_tuple[next_tuple_index])
+        area += calc_area(overlap)
+    return area
 
 
 def calculate(rectangles):
@@ -52,24 +50,20 @@ def calculate(rectangles):
     #   x line is x1 -> x2, 
     #   y line is y1 -> y2
     
-    # first add cardinality & calc initial area
-    crects = {}
+    # first calc initial area
     total_area = 0
-    for count in range(0, len(rectangles)):
-        crects[frozenset([count])] = rectangles[count]
-        total_area += calc_area(rectangles[count])
-        
-    print('cardinality ', 1, ' rects ', len(crects))
+    for rect in rectangles:
+        total_area += calc_area(rect)
+    # print("initial area ", total_area)
     
-    # now process each cardinality of overlaps
-    cardinality = 2
-    while len(crects) > 0:
-        oarea, crects = process_overlaps(cardinality, crects)
-        if cardinality % 2 ==0:
-            total_area -= oarea
+    # now process intersection of subsets size 2, 3, ...
+    for count in range(2, len(rectangles) + 1):
+        overlap_area = process_overlaps(count, rectangles)
+        if count % 2 == 0:
+            total_area -= overlap_area
         else:
-            total_area += oarea
-        cardinality += 1
+            total_area += overlap_area
+        # print("round ", count, " ", total_area)
     return total_area
     
 
