@@ -4,6 +4,41 @@
 
 from itertools import combinations
 
+def rect_to_points(rect):
+    x1, y1, x2, y2 = rect
+    return [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
+    
+# check a point and rectangle and deterimine if poiont A
+# is contained inside rect B. (not on line but
+# actually inside) If so, return True
+def inside_point_check(pointA, rectB):
+    xa, ya = pointA
+    x1b, y1b, x2b, y2b = rectB
+    if x1b < xa < x2b and y1b < ya < y2b:
+        return True
+    else:
+        return False
+
+# check all points of rect A if inside rect B and return
+# list of points (one, two, or four) if inside
+def inside_rect_check(rectA, rectB):
+    return_list = []
+    point_list = rect_to_points(rectA)
+    for point in point_list:
+        if inside_point_check(point, rectB):
+            return_list.append(point)
+    return return_list
+
+# split a rectangle into four at a point inside it
+# return four new rects
+def split_rect(point, rect):
+    x, y = point
+    x1, y1, x2, y2 = rect
+    return [(x1, y1, x, y), (x1, y, x, y2), (x, y, x2, y2), (x, y1, x2, y)]
+
+
+
+
 # check two lines and return overlapping portion of line (0 if none)
 #   linea, lineb = (a1, a2), (b1, b2)
 def line_overlaps(linea, lineb):
@@ -116,4 +151,3 @@ for title,its in TESTS:
             @test.it(sub_title)
             def _():
                 test.assert_equals(calculate(rects), exp)
-
