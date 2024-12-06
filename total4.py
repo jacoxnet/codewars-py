@@ -1,14 +1,35 @@
 #total area covered by rectangles 3kyu
 # rectangles are in form x1, y1, x2, y2 (bottom left - top right)
+
+
+import numpy as np
+
+def get_bounds(rectangles):
+    lowx, lowy = (100, 100)
+    highx, highy = (100, 100)
+    for (x1, y1, x2, y2) in rectangles:
+        if x1 < lowx:
+            lowx = x1
+        if y1 < lowy:
+            lowy = y1
+        if x2 > highx:
+            highx = x2
+        if y2 > highy:
+            highy= y2
+    return ((lowx, lowy), (highx, highy))
+
 def calculate(rectangles):
-    points = set()
+    (lowx, lowy), (highx, highy) = get_bounds(rectangles)
+    # convert high to lowbound zero
+    new_highx = highx - lowx; new_highy = highy - lowy
+
+    points = np.zeros((highx, highy), dtype=bool)
     
-    for rect in rectangles:
-        x1, y1, x2, y2 = rect
-        for x in range(x1, x2):
-            for y in range(y1, y2):
-                points.add((x,y))
-    return len(points)
+    for (x1, y1, x2, y2) in rectangles:
+        newx1 = x1 - lowx; newy1 = y1 - lowy; newx2 = x2 - lowx; newy2 = y2 - lowy
+        new_rect = np.ones((newx2 - newx1, newy2 - newy1), dtype=bool)
+        points[newx1:newx2, newy1:newy2] = new_rect
+    return points.sum()
     
 
 
